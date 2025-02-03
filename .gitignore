@@ -1,0 +1,36 @@
+# Terraform State Files (🚨 Sensitive: Never Commit These!)
+terraform.tfstate
+terraform.tfstate.backup
+
+# Terraform Provider Binaries & Local Modules
+.terraform/
+terraform-provider-*
+
+# Ignore Terraform plan output files
+*.tfplan
+
+# Ignore Terraform-generated crash logs
+crash.log
+
+# Ignore Terraform variable files that may contain secrets
+*.tfvars
+*.tfvars.json
+
+# Ignore SSH keys & sensitive credentials (AWS, GCP, etc.)
+*.pem
+*.key
+*.crt
+*.cert
+*.pfx
+*.env
+.aws/
+.gcp/
+
+# Ignore IDE and Editor-specific files
+.idea/
+.vscode/
+*.iml
+.DS_Store
+
+# Ignore system-specific files
+Thumbs.db
