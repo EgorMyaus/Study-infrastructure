@@ -1,9 +1,18 @@
-data "aws_ami" "amazon_linux" {
+/*data "aws_ami" "amazon_linux" {
   most_recent = true
   owners = ["amazon"]
   filter {
     name   = "name"
     values = var.ami_filter
+  }
+}*/
+
+data "aws_ami" "packer_ami" {
+  most_recent = true
+  owners = ["self"]  # Only look for AMIs in your account
+  filter {
+    name = "name"
+    values = ["custom-nginx-ami-*"]  # Match AMI built by Packer
   }
 }
 
@@ -13,7 +22,7 @@ resource "aws_iam_instance_profile" "ec2_instance_profile" {
 }
 
 resource "aws_instance" "web_server_instance" {
-  ami           = data.aws_ami.amazon_linux.id
+  ami           = data.aws_ami.packer_ami.id
   instance_type = var.instance_type
   associate_public_ip_address = true
   # Use security group from module input
@@ -28,22 +37,6 @@ resource "aws_instance" "web_server_instance" {
   user_data = <<-EOF
                 #!/bin/bash
                 set -ex
-
-                # Update System Packages
-                yum update -y
-
-                # Install Docker
-                yum install -y docker
-                systemctl enable docker
-                systemctl start docker
-                usermod -aG docker ec2-user
-
-                # Install Latest Docker Compose
-                curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-                chmod +x /usr/local/bin/docker-compose
-
-                docker --version
-                docker-compose --version
 
                 # Update the system
                 yum update -y
