@@ -1,10 +1,16 @@
-cd packer
+
+# Infrastructure as Code
+- cd packer
 - packer build -var-file=variables.pkrvars.hcl docker-nginx.pkr.hcl
 
-cd terraform
+# terraform
+- cd terraform
 - terraform init 
 - terraform plan 
 - terraform apply
+
+# ssh
+ssh -i ~/.ssh/aws_ec2_ed25519 ec2-user@54.209.204.243
 
 
 # troubleshooting
