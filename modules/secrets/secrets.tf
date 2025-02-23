@@ -7,13 +7,14 @@ resource "random_password" "my_secret_password" {
   numeric = true
 }
 
-# RESOURCE: AWS Secrets Manager Secret
+# AWS Secrets Manager Secret
 resource "aws_secretsmanager_secret" "my_test_secret" {
   name        = var.secret_name
+  recovery_window_in_days = 0
   description = "Randomly generated secret managed by Terraform"
 }
 
-# RESOURCE: AWS Secrets Manager Secret Version (Stores the Random Password)
+# AWS Secrets Manager Secret Version (Stores the Random Password)
 resource "aws_secretsmanager_secret_version" "my_test_secret_value" {
   secret_id     = aws_secretsmanager_secret.my_test_secret.id
   secret_string = jsonencode({
@@ -21,4 +22,3 @@ resource "aws_secretsmanager_secret_version" "my_test_secret_value" {
     password = random_password.my_secret_password.result
   })
 }
-
