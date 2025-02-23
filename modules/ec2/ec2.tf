@@ -1,11 +1,50 @@
-/*data "aws_ami" "amazon_linux" {
-  most_recent = true
-  owners = ["amazon"]
-  filter {
-    name   = "name"
-    values = var.ami_filter
-  }
-}*/
+resource "aws_iam_policy" "secret_manager_policy" {
+  name        = "secret_manager_access"
+  description = "Allow EC2 instance to access Secrets Manager"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "secretsmanager:GetSecretValue",
+          "secretsmanager:DescribeSecret",
+          "secretsmanager:ListSecrets"
+        ]
+        Resource = "*"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role" "ec2_role" {
+  name        = var.iam_role_name
+  description = "Allow EC2 instance to assume role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          Service = "ec2.amazonaws.com"
+        }
+        Action = "sts:AssumeRole"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "attach_secret_manager" {
+  role       = aws_iam_role.ec2_role.name
+  policy_arn = aws_iam_policy.secret_manager_policy.arn
+}
+
+resource "aws_iam_instance_profile" "ec2_instance_profile" {
+  name = var.iam_instance_profile_name
+  role = var.iam_role_name
+}
 
 data "aws_ami" "packer_ami" {
   most_recent = true
@@ -14,11 +53,6 @@ data "aws_ami" "packer_ami" {
     name = "name"
     values = ["custom-nginx-ami-*"]  # Match AMI built by Packer
   }
-}
-
-resource "aws_iam_instance_profile" "ec2_instance_profile" {
-  name = var.iam_instance_profile_name
-  role = var.iam_role_name
 }
 
 resource "aws_instance" "web_server_instance" {

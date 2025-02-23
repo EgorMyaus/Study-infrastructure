@@ -18,12 +18,8 @@ module "ec2" {
   source        = "../modules/ec2"
   security_group_ids = [module.security.sg_id]  # Get security group ID from module
   key_pair_name = module.key_pair.key_pair_name  # Get key pair name from module
-  iam_instance_profile_name = module.iam.instance_profile_name # Attach IAM Profile
-  iam_role_name = module.iam.role_name  # Get IAM role name from module
-}
-
-module "iam" {
-  source = "../modules/iam"
+  iam_instance_profile_name = var.iam_instance_profile_name # Attach IAM Profile
+  iam_role_name = var.iam_role_name  # Get IAM role name from module
 }
 
 module "key_pair" {
