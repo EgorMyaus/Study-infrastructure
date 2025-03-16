@@ -30,7 +30,7 @@ module "vpc" {
 module "ec2" {
   source                    = "../modules/ec2"
   ami_id                    = data.aws_ami.packer_ami.id
-  subnet_id                 = module.vpc.public_subnets[0] # First private subnet
+  subnet_id                 = module.vpc.private_subnets[0] # First private subnet
   security_group_ids        = [module.security.ec2_sg_id]   # Get ec2 security group ID from module
   key_pair_name             = module.ec2.key_pair_name      # Get key pair name from module
   iam_instance_profile_name = var.iam_instance_profile_name # Attach IAM Profile

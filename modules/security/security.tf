@@ -21,6 +21,7 @@ resource "aws_security_group" "ec2_sg" {
   # In AWS security groups, cidr_blocks defines which IP addresses or
   # IP ranges can access your EC2 instance over a specific port
   ingress {
+    description = "SSH"
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
