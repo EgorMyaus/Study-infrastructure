@@ -10,7 +10,7 @@
 - terraform apply
 
 # ssh
-ssh -i ~/.ssh/aws_ec2_ed25519 ec2-user@54.209.204.243
+ssh -i ~/.ssh/aws_ec2_ed25519 ec2-user@54.152.23.38
 
 
 # troubleshooting

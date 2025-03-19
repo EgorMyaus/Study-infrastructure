@@ -1,3 +1,33 @@
+# RESOURCE: Generate a Random Password
+resource "random_password" "my_secret_password" {
+  length  = 16
+  special = true
+  upper   = true
+  lower   = true
+  numeric = true
+}
+
+# AWS Secrets Manager Secret
+resource "aws_secretsmanager_secret" "my_test_secret" {
+  name                    = var.secret_name
+  recovery_window_in_days = 0
+  description             = "Randomly generated secret managed by Terraform"
+}
+
+# AWS Secrets Manager Secret Version (Stores the Random Password)
+resource "aws_secretsmanager_secret_version" "my_test_secret_value" {
+  secret_id = aws_secretsmanager_secret.my_test_secret.id
+  secret_string = jsonencode({
+    username = "admin"
+    password = random_password.my_secret_password.result
+  })
+}
+
+resource "aws_key_pair" "my_key_pair" {
+  key_name = var.key_name
+  public_key = file("~/.ssh/aws_ec2_ed25519.pub")
+}
+
 resource "aws_iam_policy" "secret_manager_policy" {
   name        = "secret_manager_access"
   description = "Allow EC2 instance to access Secrets Manager"
@@ -46,17 +76,8 @@ resource "aws_iam_instance_profile" "ec2_instance_profile" {
   role = var.iam_role_name
 }
 
-data "aws_ami" "packer_ami" {
-  most_recent = true
-  owners = ["self"]  # Only look for AMIs in your account
-  filter {
-    name = "name"
-    values = ["custom-nginx-ami-*"]  # Match AMI built by Packer
-  }
-}
-
 resource "aws_instance" "web_server_instance" {
-  ami           = data.aws_ami.packer_ami.id
+  ami           = var.ami_id
   instance_type = var.instance_type
   associate_public_ip_address = true
   # Use security group from module input
@@ -67,6 +88,8 @@ resource "aws_instance" "web_server_instance" {
 
   # Use IAM instance profile from module input
   iam_instance_profile = aws_iam_instance_profile.ec2_instance_profile.name
+
+  subnet_id = var.subnet_id
 
   user_data = <<-EOF
                 #!/bin/bash

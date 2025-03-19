@@ -22,3 +22,15 @@ variable "iam_instance_profile_name" {
   default     = "ec2-instance-profile"
 }
 
+variable "instance_type" {
+  description = "Instance type for EC2."
+  type        = string
+  default     = "t2.micro"
+}
+
+variable "key_name" {
+  description = "SSH key name."
+  type        = string
+  default     = "my-key-pair"
+}
+
